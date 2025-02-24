@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Clona Repository') {
             steps {
-                git 'https://github.com/keerti1924/Python-Flask-CRUD-App.git'
+                git 'https://github.com/Ciro-Gallucci/Python-Flask-CRUD-App.git'
             }
         }
         stage('Build Docker Compose') {
