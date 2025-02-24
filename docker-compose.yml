@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: flask_mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: students_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  app:
+    build: .
+    container_name: flask_crud_app
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: students_db
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+
+volumes:
+  mysql_data:
