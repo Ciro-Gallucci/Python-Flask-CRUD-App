@@ -28,8 +28,13 @@ services:
       DB_NAME: students_db
     ports:
       - "5000:5000"
-    volumes:
-      - .:/app
+    command: ["python", "app.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
 
 volumes:
   mysql_data:
