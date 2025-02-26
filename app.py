@@ -11,7 +11,7 @@ app.secret_key = 'flash message'
 # Configurazione del database MySQL tramite variabili d'ambiente
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'password'  # Inserisci la password corretta
+app.config['MYSQL_PASSWORD'] = ''  # Inserisci la password corretta
 app.config['MYSQL_DB'] = 'python_crud'
 
 mysql = MySQL(app)
@@ -100,10 +100,10 @@ def update():
             flash("Data Updated Successfully")
 
             cur = mysql.connection.cursor()
-            cur.execute(""" 
-                UPDATE students 
-                SET name=%s, email=%s, phone=%s 
-                WHERE id=%s 
+            cur.execute("""
+                UPDATE students
+                SET name=%s, email=%s, phone=%s
+                WHERE id=%s
             """, (name, email, phone, id_data))
             mysql.connection.commit()
             cur.close()
