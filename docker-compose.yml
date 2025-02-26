@@ -28,7 +28,7 @@ services:
       DB_NAME: students_db
     ports:
       - "5000:5000"
-    command: ["python", "app.py"]
+    command: ["./wait-for-it.sh", "db:3306", "--", "python", "app.py"]  # Usa wait-for-it per aspettare MySQL
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000"]
       interval: 10s
