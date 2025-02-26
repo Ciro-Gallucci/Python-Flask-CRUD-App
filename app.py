@@ -100,10 +100,10 @@ def update():
             flash("Data Updated Successfully")
 
             cur = mysql.connection.cursor()
-            cur.execute("""
-                UPDATE students
-                SET name=%s, email=%s, phone=%s
-                WHERE id=%s
+            cur.execute(""" 
+                UPDATE students 
+                SET name=%s, email=%s, phone=%s 
+                WHERE id=%s 
             """, (name, email, phone, id_data))
             mysql.connection.commit()
             cur.close()
