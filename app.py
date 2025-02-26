@@ -9,10 +9,10 @@ fa = FontAwesome(app)
 app.secret_key = 'flash message'
 
 # Configurazione del database MySQL tramite variabili d'ambiente
-#app.config['MYSQL_HOST'] = 'localhost'
-#app.config['MYSQL_USER'] = 'root'
-#app.config['MYSQL_PASSWORD'] = ''  # Inserisci la password corretta
-#app.config['MYSQL_DB'] = 'python_crud'
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''  # Inserisci la password corretta
+app.config['MYSQL_DB'] = 'python_crud'
 
 mysql = MySQL(app)
 
