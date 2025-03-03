@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_mysqldb import MySQL
 from flask_fontawesome import FontAwesome
 import logging
+import time
+import MySQLdb
 
 app = Flask(__name__)
 fa = FontAwesome(app)
@@ -18,15 +20,22 @@ mysql = MySQL(app)
 
 # Funzione per verificare la connessione al database
 def check_db_connection():
-    try:
-        conn = mysql.connection
-        conn.ping()  # Verifica che la connessione sia ancora attiva
-        logging.debug("Connessione al database avvenuta con successo!")
-        return True
-    except Exception as e:
-        logging.error(f"Errore di connessione al database: {str(e)}")
-        flash(f"Errore di connessione al database: {str(e)}")
-        return False
+    retries = 5
+    while retries > 0:
+        try:
+            conn = MySQLdb.connect(
+                host="db",  # Assicurati che sia "db" e non "localhost"
+                user="user",
+                passwd="password",
+                db="students_db"
+            )
+            conn.ping()  # Test della connessione
+            return True
+        except Exception as e:
+            print(f"Database non pronto, retrying... ({retries} tentativi rimanenti) - Errore: {e}")
+            time.sleep(5)
+            retries -= 1
+    return False
 
 
 @app.route('/')
@@ -136,9 +145,9 @@ def delete(id_data):
 logging.basicConfig(level=logging.DEBUG)
 
 if __name__ == "__main__":
-    # Verifica se il database è connesso prima di avviare l'app
-    if not check_db_connection():
-        print("Impossibile connettersi al database. L'app non può essere avviata.")
-    else:
+    if check_db_connection():
+        print("Database pronto, avvio Flask...")
         app.run(host='0.0.0.0', port=5000, debug=True)
+    else:
+        print("Database non disponibile, terminazione.")
 
