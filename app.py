@@ -140,4 +140,5 @@ if __name__ == "__main__":
     if not check_db_connection():
         print("Impossibile connettersi al database. L'app non può essere avviata.")
     else:
-        app.run(debug=True, host='0.0.0.0', port=5000)
+        app.run(host='0.0.0.0', port=5000, debug=True)
+
