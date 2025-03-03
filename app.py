@@ -10,16 +10,44 @@ fa = FontAwesome(app)
 
 app.secret_key = 'flash message'
 
-# Configurazione del database MySQL tramite variabili d'ambiente
+'''# Configurazione del database MySQL tramite variabili d'ambiente
 app.config['MYSQL_HOST'] = 'db'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''  # Inserisci la password corretta
-app.config['MYSQL_DB'] = 'python_crud'
+app.config['MYSQL_DB'] = 'python_crud' '''
+
+# Configurazione del database
+DB_HOST = "db"  # Deve essere "db", non "localhost"
+DB_USER = "user"
+DB_PASSWORD = "password"
+DB_NAME = "students_db"
 
 mysql = MySQL(app)
 
+
+def wait_for_db():
+    retries = 10
+    while retries > 0:
+        try:
+            conn = MySQLdb.connect(
+                host=DB_HOST,
+                user=DB_USER,
+                passwd=DB_PASSWORD,
+                db=DB_NAME
+            )
+            conn.ping()  # Test della connessione
+            conn.close()
+            print("Database pronto!")
+            return True
+        except Exception as e:
+            print(f"Database non pronto, riprovo... ({retries} tentativi rimanenti) - Errore: {e}")
+            time.sleep(5)
+            retries -= 1
+    print("Database non disponibile, uscita.")
+    return False
+
 # Funzione per verificare la connessione al database
-def check_db_connection():
+'''def check_db_connection():
     retries = 5
     while retries > 0:
         try:
@@ -35,7 +63,7 @@ def check_db_connection():
             print(f"Database non pronto, retrying... ({retries} tentativi rimanenti) - Errore: {e}")
             time.sleep(5)
             retries -= 1
-    return False
+    return False'''
 
 
 @app.route('/')
@@ -145,9 +173,8 @@ def delete(id_data):
 logging.basicConfig(level=logging.DEBUG)
 
 if __name__ == "__main__":
-    if check_db_connection():
+    if wait_for_db():
         print("Database pronto, avvio Flask...")
         app.run(host='0.0.0.0', port=5000, debug=True)
     else:
-        print("Database non disponibile, terminazione.")
-
+        exit(1) # Se il database non è pronto, il container si ferma
