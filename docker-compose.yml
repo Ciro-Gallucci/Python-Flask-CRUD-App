@@ -37,7 +37,7 @@ services:
       - "5000:5000"
     command: ["python", "app.py"]
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000" || exit 1]
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
       interval: 10s
       retries: 5
       timeout: 5s
