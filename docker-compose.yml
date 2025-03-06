@@ -6,7 +6,7 @@ services:
     container_name: flask_mysql_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: students_db
       MYSQL_USER: user
       MYSQL_PASSWORD: password
