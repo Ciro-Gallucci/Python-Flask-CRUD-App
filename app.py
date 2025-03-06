@@ -14,13 +14,27 @@ app.secret_key = 'flash message'
 app.config['MYSQL_HOST'] = 'db'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''  # Inserisci la password corretta
-app.config['MYSQL_DB'] = 'python_crud' '''
+app.config['MYSQL_DB'] = 'python_crud'
+'''
 
+'''
 # Configurazione del database
 DB_HOST = "db"  # Deve essere "db", non "localhost"
 DB_USER = "user"
 DB_PASSWORD = "password"
 DB_NAME = "students_db"
+'''
+
+# Configurazione del database
+DB_HOST = "db"
+DB_USER = "user"
+DB_PASSWORD = "password"
+DB_NAME = "students_db"
+
+app.config['MYSQL_HOST'] = DB_HOST
+app.config['MYSQL_USER'] = DB_USER
+app.config['MYSQL_PASSWORD'] = DB_PASSWORD
+app.config['MYSQL_DB'] = DB_NAME
 
 mysql = MySQL(app)
 
