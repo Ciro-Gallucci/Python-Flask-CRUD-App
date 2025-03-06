@@ -33,7 +33,8 @@ def wait_for_db():
                 host=DB_HOST,
                 user=DB_USER,
                 passwd=DB_PASSWORD,
-                db=DB_NAME
+                db=DB_NAME.
+                charset="utf8mb4"
             )
             conn.ping()  # Test della connessione
             conn.close()
