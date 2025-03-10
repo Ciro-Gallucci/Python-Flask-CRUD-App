@@ -1,12 +1,19 @@
-FROM python:3.9
+FROM python:3.9-slim
 
+# Installa le dipendenze di sistema
+RUN apt-get update && apt-get install -y \
+    default-mysql-client \  # Oppure mariadb-client
+    && rm -rf /var/lib/apt/lists/*
+
+# Copia il codice dell'applicazione
+COPY . /app
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
+# Installa le dipendenze Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Esponi la porta 5000
+EXPOSE 5000
 
-RUN chmod +x /app/app.py
-
+# Comando per avviare l'applicazione
 CMD ["python", "app.py"]
