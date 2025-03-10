@@ -80,7 +80,7 @@ def wait_for_db():
             retries -= 1
     return False'''
 
-
+'''
 @app.route('/')
 def index():
     try:
@@ -95,6 +95,27 @@ def index():
             flash("Errore nella connessione al database!")
             logging.error("Connessione al database fallita!")
             return render_template('index.html', students=[])
+    except Exception as e:
+        flash(f"Errore durante il recupero dei dati: {e}")
+        logging.error(f"Errore durante il recupero dei dati: {e}")
+        return render_template('index.html', students=[])
+
+    return render_template('index.html', students=data)
+'''
+
+@app.route('/')
+def index():
+    # Usa il check_db_connection
+    if not wait_for_db():  # o check_db_connection()
+        flash("Errore nella connessione al database!")
+        logging.error("Connessione al database fallita!")
+        return render_template('index.html', students=[])
+
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM students")
+        data = cur.fetchall()
+        cur.close()
     except Exception as e:
         flash(f"Errore durante il recupero dei dati: {e}")
         logging.error(f"Errore durante il recupero dei dati: {e}")
