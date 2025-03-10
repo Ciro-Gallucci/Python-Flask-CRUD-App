@@ -3,5 +3,3 @@ Werkzeug==2.0.1
 mysql-connector-python==8.0.26
 flask-fontawesome
 flask_mysqldb
-Flask-SQLAlchemy==2.5.1
-mysqlclient==2.1.0
