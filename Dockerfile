@@ -1,15 +1,12 @@
-FROM python:3.8-slim
+FROM python:3.9
 
 WORKDIR /app
 
-# Copia i file del progetto
-COPY . /app
-
-# Installa le dipendenze
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Esponi la porta per Flask
-EXPOSE 5000
+COPY . .
 
-# Esegui l'applicazione Flask
+RUN chmod +x /app/app.py
+
 CMD ["python", "app.py"]
