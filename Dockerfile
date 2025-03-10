@@ -2,10 +2,8 @@
 FROM python:3.9-slim
 
 # Installa le dipendenze di sistema (es. default-mysql-client)
-RUN apt-get update && apt-get install -y \
-    default-mysql-client \  # Installazione di mysql-client
-    && rm -rf /var/lib/apt/lists/*  # Pulisci la cache di apt per ridurre le dimensioni dell'immagine
-
+RUN apt-get update && apt-get install -y default-mysql-client \
+    && rm -rf /var/lib/apt/lists/* 
 # Imposta la directory di lavoro
 WORKDIR /app
 
