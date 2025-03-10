@@ -1,18 +1,12 @@
-FROM python:3.10-slim
+FROM python:3.9
 
-# Installa i pacchetti di sistema necessari
-RUN apt-get update && apt-get install -y \
-    gcc \
-    default-libmysqlclient-dev \
-    pkg-config \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copia i file
 WORKDIR /app
-COPY . /app
 
-# Installa i requirements
-RUN pip install --upgrade pip
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+RUN chmod +x /app/app.py
 
 CMD ["python", "app.py"]
