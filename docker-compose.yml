@@ -1,11 +1,10 @@
-version: '3.8'
-
 services:
-  flask_mysql_db:
+  db:
     image: mysql:5.7
+    container_name: flask_mysql_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: students_db
       MYSQL_USER: user
       MYSQL_PASSWORD: password
@@ -13,29 +12,34 @@ services:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Auto-import dello schema iniziale
-    networks:
-      - flask_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-ppassword"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+      start_period: 10s
 
-  flask_crud_app:
-    build:
-      context: .      # Usa la root del progetto!
+  app:
+    build: .
+    container_name: flask_crud_app
     restart: always
     depends_on:
-      - flask_mysql_db
+      db:
+        condition: service_healthy
     environment:
-      DB_HOST: flask_mysql_db
+      DB_HOST: db
       DB_USER: user
       DB_PASSWORD: password
       DB_NAME: students_db
     ports:
       - "5000:5000"
-    networks:
-      - flask_network
-    command: ["python", "app.py"]  # Niente entrypoint.sh, è diretto!
+    command: ["python", "app.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+      start_period: 20s
 
 volumes:
   mysql_data:
-
-networks:
-  flask_network:
