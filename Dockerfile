@@ -1,21 +1,25 @@
 FROM python:3.10-slim
 
-# Installa librerie di sistema necessarie
+# Install required system packages
 RUN apt-get update && apt-get install -y \
-    gcc \
+    build-essential \
     default-libmysqlclient-dev \
-    libffi-dev \
+    pkg-config \
+    gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Imposta la directory di lavoro
+# Set working directory
 WORKDIR /app
 
-# Copia i file principali
-COPY requirements.txt .
+# Copy all files into the container
+COPY . .
+
+# Install Python dependencies
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia il resto (app.py)
-COPY app.py .
+# Expose the port Flask runs on
+EXPOSE 5000
 
-# Comando di default
+# Run the app
 CMD ["python", "app.py"]
