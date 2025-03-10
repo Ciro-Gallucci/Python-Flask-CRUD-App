@@ -1,40 +1,45 @@
-version: '3.8'
-
 services:
-  flask_mysql_db:
+  db:
     image: mysql:5.7
     container_name: flask_mysql_db
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: flask_db
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: students_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3307:3306"
     volumes:
-      - app_mysql_data:/var/lib/mysql
-    networks:
-      - app_network
+      - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 30s
-      retries: 3
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-ppassword"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
       start_period: 10s
-      timeout: 10s
 
-  flask_crud_app:
+  app:
     build: .
     container_name: flask_crud_app
-    environment:
-      - FLASK_ENV=development
-      - DATABASE_URL=mysql://root:root_password@flask_mysql_db/flask_db
+    restart: always
     depends_on:
-      - flask_mysql_db
-    networks:
-      - app_network
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: students_db
     ports:
       - "5000:5000"
+    command: ["python", "app.py"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+      start_period: 20s
 
 volumes:
-  app_mysql_data:
-    driver: local
-
-networks:
-  app_network:
-    driver: bridge
+  mysql_data:
