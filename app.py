@@ -10,8 +10,23 @@ fa = FontAwesome(app)
 
 app.secret_key = 'flash message'
 
+'''# Configurazione del database MySQL tramite variabili d'ambiente
+app.config['MYSQL_HOST'] = 'db'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''  # Inserisci la password corretta
+app.config['MYSQL_DB'] = 'python_crud'
+'''
+
+'''
 # Configurazione del database
 DB_HOST = "db"  # Deve essere "db", non "localhost"
+DB_USER = "user"
+DB_PASSWORD = "password"
+DB_NAME = "students_db"
+'''
+
+# Configurazione del database
+DB_HOST = "db"
 DB_USER = "user"
 DB_PASSWORD = "password"
 DB_NAME = "students_db"
@@ -23,17 +38,11 @@ app.config['MYSQL_DB'] = DB_NAME
 
 mysql = MySQL(app)
 
-# Configura il logger
-logging.basicConfig(level=logging.DEBUG)
 
 def wait_for_db():
-    max_retries = 20  # Numero massimo di tentativi
-    retry_interval = 10  # Intervallo di attesa tra i tentativi (in secondi)
-    retries = 0
-
-    while retries < max_retries:
+    retries = 10
+    while retries > 0:
         try:
-            # Prova a connetterti al database
             conn = MySQLdb.connect(
                 host=DB_HOST,
                 user=DB_USER,
@@ -41,29 +50,36 @@ def wait_for_db():
                 db=DB_NAME,
                 charset="utf8mb4"
             )
-            conn.ping()  # Verifica che la connessione sia attiva
-            conn.close()  # Chiudi la connessione
-            logging.info("Connessione al database stabilita con successo!")
+            conn.ping()  # Test della connessione
+            conn.close()
+            print("Database pronto!")
             return True
-        except MySQLdb.OperationalError as e:
-            # Se la connessione fallisce, registra l'errore e riprova
-            retries += 1
-            logging.warning(
-                f"Tentativo {retries}/{max_retries}: Connessione al database fallita. "
-                f"Riprovo tra {retry_interval} secondi. Errore: {e}"
-            )
-            time.sleep(retry_interval)
         except Exception as e:
-            # Gestisci altri errori imprevisti
-            logging.error(f"Errore imprevisto durante la connessione al database: {e}")
-            return False
-
-    # Se si superano i tentativi massimi, restituisci False
-    logging.error(
-        f"Impossibile connettersi al database dopo {max_retries} tentativi. "
-        "Verifica la configurazione del database."
-    )
+            print(f"Database non pronto, riprovo... ({retries} tentativi rimanenti) - Errore: {e}")
+            time.sleep(5)
+            retries -= 1
+    print("Database non disponibile, uscita.")
     return False
+
+# Funzione per verificare la connessione al database
+'''def check_db_connection():
+    retries = 5
+    while retries > 0:
+        try:
+            conn = MySQLdb.connect(
+                host="db",  # Assicurati che sia "db" e non "localhost"
+                user="user",
+                passwd="password",
+                db="students_db"
+            )
+            conn.ping()  # Test della connessione
+            return True
+        except Exception as e:
+            print(f"Database non pronto, retrying... ({retries} tentativi rimanenti) - Errore: {e}")
+            time.sleep(5)
+            retries -= 1
+    return False'''
+
 
 @app.route('/')
 def index():
@@ -85,6 +101,7 @@ def index():
         return render_template('index.html', students=[])
 
     return render_template('index.html', students=data)
+
 
 @app.route('/insert', methods=['POST'])
 def insert():
@@ -114,6 +131,7 @@ def insert():
 
         return redirect(url_for('index'))
 
+
 @app.route('/update', methods=['POST', 'GET'])
 def update():
     if request.method == "POST":
@@ -127,8 +145,12 @@ def update():
             flash("Please fill in all fields!")
             return redirect(url_for('index'))
 
+        if not check_db_connection():
+            return redirect(url_for('index'))
+
         try:
             flash("Data Updated Successfully")
+
             cur = mysql.connection.cursor()
             cur.execute("""
                 UPDATE students
@@ -143,10 +165,15 @@ def update():
 
     return redirect(url_for('index'))
 
+
 @app.route('/delete/<string:id_data>', methods=['POST', 'GET'])
 def delete(id_data):
+    if not check_db_connection():
+        return redirect(url_for('index'))
+
     try:
         flash("Data Deleted Successfully")
+
         cur = mysql.connection.cursor()
         cur.execute("DELETE FROM students WHERE id=%s", (id_data,))
         mysql.connection.commit()
@@ -156,10 +183,13 @@ def delete(id_data):
 
     return redirect(url_for('index'))
 
+
+# Configura il logger
+logging.basicConfig(level=logging.DEBUG)
+
 if __name__ == "__main__":
     if wait_for_db():
-        logging.info("Database pronto, avvio Flask...")
+        print("Database pronto, avvio Flask...")
         app.run(host='0.0.0.0', port=5000, debug=True)
     else:
-        logging.error("Impossibile connettersi al database. Uscita.")
-        exit(1)
+        exit(1) # Se il database non è pronto, il container si ferma
