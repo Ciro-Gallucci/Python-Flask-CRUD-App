@@ -42,7 +42,7 @@ def wait_for_db():
             return True
         except Exception as e:
             print(f"Database non pronto, riprovo... ({retries} tentativi rimanenti) - Errore: {e}")
-            time.sleep(5)
+            time.sleep(5)  # Attendere 5 secondi prima di riprovare
             retries -= 1
     print("Database non disponibile, uscita.")
     return False
