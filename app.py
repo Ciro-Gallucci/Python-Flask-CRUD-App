@@ -80,7 +80,7 @@ def wait_for_db():
             retries -= 1
     return False'''
 
-
+'''
 @app.route('/')
 def index():
     try:
@@ -101,7 +101,27 @@ def index():
         return render_template('index.html', students=[])
 
     return render_template('index.html', students=data)
+'''
+@app.route('/')
+def index():
+    try:
+        # Verifica la connessione al database
+        if mysql.connection:
+            logging.debug("Connessione al database stabilita con successo")
+            cur = mysql.connection.cursor()
+            cur.execute("SELECT * FROM students")
+            data = cur.fetchall()
+            cur.close()
+        else:
+            flash("Errore nella connessione al database!")
+            logging.error("Connessione al database fallita!")
+            return render_template('index.html', students=[])
+    except Exception as e:
+        flash(f"Errore durante il recupero dei dati: {e}")
+        logging.error(f"Errore durante il recupero dei dati: {e}")
+        return render_template('index.html', students=[])
 
+    return render_template('index.html', students=data)
 
 @app.route('/insert', methods=['POST'])
 def insert():
